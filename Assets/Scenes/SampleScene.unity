@@ -396,7 +396,7 @@ MonoBehaviour:
   m_LightEstimationMode: -1
   m_AutoFocus: 1
   m_ImageStabilization: 0
-  m_LightEstimation: 31
+  m_LightEstimation: 0
   m_FacingDirection: 1
   m_RenderMode: 0
 --- !u!20 &951477256
@@ -491,7 +491,6 @@ GameObject:
   - component: {fileID: 1029017558}
   - component: {fileID: 1029017557}
   - component: {fileID: 1029017556}
-  - component: {fileID: 1029017559}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -528,20 +527,6 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!114 &1029017559
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1029017555}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cf702359e39524bf1a5658bfc76c2be4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LightEstimation
-  ARCameraManager: {fileID: 1913968817}
-  Light: {fileID: 1029017557}
 --- !u!108 &1029017557
 Light:
   m_ObjectHideFlags: 0
@@ -655,7 +640,7 @@ MonoBehaviour:
   Package: {fileID: 0}
   PackagePrefab: {fileID: 7734861169323980269, guid: 173685bc93484464b88d9f788d582359, type: 3}
   SpawnDistanceFromReference: 0.4
-  SurfaceOffset: 0.06
+  SurfaceOffset: 0.02
 --- !u!4 &1208069127
 Transform:
   m_ObjectHideFlags: 0
@@ -1039,7 +1024,7 @@ MonoBehaviour:
   m_LightEstimationMode: -1
   m_AutoFocus: 1
   m_ImageStabilization: 0
-  m_LightEstimation: 31
+  m_LightEstimation: 0
   m_FacingDirection: 1
   m_RenderMode: 0
 --- !u!81 &1913968818

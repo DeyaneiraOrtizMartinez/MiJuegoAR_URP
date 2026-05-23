@@ -23,7 +23,7 @@ public class PackageSpawner : MonoBehaviour
     public PackageBehaviour Package;
     public GameObject PackagePrefab;
     public float SpawnDistanceFromReference = 0.4f;
-    public float SurfaceOffset = 0.06f;
+    public float SurfaceOffset = 0.02f;
 
     public static Vector3 RandomInTriangle(Vector3 v1, Vector3 v2)
     {
@@ -75,8 +75,6 @@ public class PackageSpawner : MonoBehaviour
         var spawnPosition = referenceTransform == null
             ? FindRandomLocation(plane)
             : FindLocationNearReference(plane, referenceTransform);
-        packageClone.transform.position = AlignToPlaneSurface(spawnPosition, plane);
-
         Package = packageClone.GetComponent<PackageBehaviour>();
 
         if (Package == null)
@@ -86,6 +84,7 @@ public class PackageSpawner : MonoBehaviour
             return;
         }
 
+        PlacePackageOnPlane(Package, spawnPosition, plane);
         Debug.Log("[AR Driving] Package spawned on the locked AR plane.", Package);
     }
 
@@ -96,12 +95,53 @@ public class PackageSpawner : MonoBehaviour
         return referenceTransform.position + offset;
     }
 
-    private Vector3 AlignToPlaneSurface(Vector3 position, ARPlane plane)
+    private void PlacePackageOnPlane(PackageBehaviour package, Vector3 targetPosition, ARPlane plane)
     {
         var planeNormal = plane.transform.up;
         var planeCenter = plane.transform.TransformPoint(plane.center);
         var surface = new Plane(planeNormal, planeCenter);
-        return position - (planeNormal * surface.GetDistanceToPoint(position)) + (planeNormal * SurfaceOffset);
+        var surfacePosition = targetPosition - (planeNormal * surface.GetDistanceToPoint(targetPosition));
+
+        package.transform.position = surfacePosition;
+        var lowestPoint = FindLowestRendererPoint(package.gameObject, planeNormal);
+        var lift = -surface.GetDistanceToPoint(lowestPoint) + SurfaceOffset;
+        package.transform.position += planeNormal * lift;
+    }
+
+    private Vector3 FindLowestRendererPoint(GameObject root, Vector3 planeNormal)
+    {
+        var renderers = root.GetComponentsInChildren<Renderer>();
+        if (renderers.Length == 0)
+        {
+            return root.transform.position;
+        }
+
+        var lowestPoint = renderers[0].bounds.center;
+        var lowestDistance = Vector3.Dot(lowestPoint, planeNormal);
+
+        foreach (var renderer in renderers)
+        {
+            var bounds = renderer.bounds;
+            for (var x = -1; x <= 1; x += 2)
+            {
+                for (var y = -1; y <= 1; y += 2)
+                {
+                    for (var z = -1; z <= 1; z += 2)
+                    {
+                        var point = bounds.center + Vector3.Scale(bounds.extents, new Vector3(x, y, z));
+                        var distance = Vector3.Dot(point, planeNormal);
+
+                        if (distance < lowestDistance)
+                        {
+                            lowestDistance = distance;
+                            lowestPoint = point;
+                        }
+                    }
+                }
+            }
+        }
+
+        return lowestPoint;
     }
 
     private void Update()
@@ -124,7 +164,7 @@ public class PackageSpawner : MonoBehaviour
                 return;
             }
 
-            Package.transform.position = AlignToPlaneSurface(Package.transform.position, lockedPlane);
+            PlacePackageOnPlane(Package, Package.transform.position, lockedPlane);
         }
     }
 }
